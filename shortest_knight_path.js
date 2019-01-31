@@ -26,10 +26,10 @@ function isNull(val) {
 const isNotNull = val => !isNull(val);
 
 // Maps algebraic notation to matrix indices
-// algToMatrix :: String -> [Number, Number] || null
+// algToMatrix :: String -> [Number, Number] | null
 function algToMatrix(cell) {
 
-  // mapX :: String -> Number || null
+  // mapX :: String -> Number | null
   function mapX(x) {
     const isCapital = (c) => (72 >= c && c >= 65);
     const isLower = (c) => (104 >= c && c >= 97);
@@ -40,7 +40,7 @@ function algToMatrix(cell) {
     return isCapital(x) ? (x - 65) : (x - 97);
   }
 
-  // mapX :: Number -> Number || null
+  // mapY :: Number -> Number | null
   function mapY(y) {
     const isValid = (c) => (9 >= c && c >= 0);
 
@@ -49,7 +49,7 @@ function algToMatrix(cell) {
 
   const [x, y] = cell.split('');
 
-  const map =  [
+  const map = [
     mapX(x.charCodeAt(0)),
     mapY(parseInt(y)),
   ];
@@ -57,10 +57,48 @@ function algToMatrix(cell) {
   return map.every(isNotNull) ? map : null;
 }
 
+// Maps matrix indices to algebraic notation
+// matrixToAlg :: [Number, Number] -> String
+function matrixToAlg(cell) {
+  const [x, y] = cell;
+
+  return [
+    String.fromCharCode(x + 97),
+    y + 1,
+  ].join('');
+
+}
+
+// Returns whether a provided position fits into chess matrix
+// onBoard :: [Number, Number] -> Boolean
+function onBoard(position) {
+  const inGrid = x => x >= 0 && x < 8
+  return position.every(inGrid);
+}
+
+// Returns a list of legit knight moves from current position
+// validMoves :: [Number, Number] -> [[Number, Number],..]
+function validMoves(position) {
+  const cellShift = [
+    [-2,  1],
+    [-2, -1],
+    [-1,  2],
+    [-1, -2],
+    [1,  2],
+    [1, -2],
+    [2,  1],
+    [2, -1],
+  ];
+
+  return cellShift
+    .map(x => [position[0] + x[0], position[1] + x[1]])
+    .filter(onBoard)
+}
+
 // Main function
-// knight :: (String, String) -> Number || null
+// knight :: (String, String) -> Number | null
 function knight(start, finish) {
-  console.log(algToMatrix(start), algToMatrix(finish));
+  console.log(validMoves(algToMatrix(finish)).map(matrixToAlg), finish);
   return null;
 }
 
