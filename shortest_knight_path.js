@@ -11,19 +11,14 @@
 
 // equals :: (a, b) -> Boolean
 function equals(arg1, arg2) {
+  console.log(`Expected: ${arg1}, got: ${arg2}`)
   return arg1 === arg2;
 }
 
-// identity :: (a) -> a
-const identity = x => x;
-
-// isNull :: (a) -> Boolean
-function isNull(val) {
-  return val === null;
-}
-
 // isNotNull :: (a) -> Boolean
-const isNotNull = val => !isNull(val);
+function isNotNull(val) {
+  return val !== null;
+}
 
 // Maps algebraic notation to matrix indices
 // algToMatrix :: String -> [Number, Number] | null
@@ -66,19 +61,20 @@ function matrixToAlg(cell) {
     String.fromCharCode(x + 97),
     y + 1,
   ].join('');
-
 }
 
 // Returns whether a provided position fits into chess matrix
 // onBoard :: [Number, Number] -> Boolean
 function onBoard(position) {
-  const inGrid = x => x >= 0 && x < 8
+  const inGrid = x => x >= 0 && x < 8;
+
   return position.every(inGrid);
 }
 
 // Returns a list of legit knight moves from current position
-// validMoves :: [Number, Number] -> [[Number, Number],..]
+// validMoves :: String -> [String]
 function validMoves(position) {
+  const _position = algToMatrix(position);
   const cellShift = [
     [-2,  1],
     [-2, -1],
@@ -91,15 +87,54 @@ function validMoves(position) {
   ];
 
   return cellShift
-    .map(x => [position[0] + x[0], position[1] + x[1]])
+    .map(x => [_position[0] + x[0], _position[1] + x[1]])
     .filter(onBoard)
+    .map(matrixToAlg)
+}
+
+// union :: ([], []) -> []
+function union(setA, setB) {
+  const _union = setA.slice();
+
+  setB.forEach(x => {
+    if (!_union.includes(x)) _union.push(x);
+  })
+
+    return _union;
+}
+
+// validMapper :: ([[String], [String]]) -> [[String], [String]]
+function validMapper([current, visited]) {
+  const reducer = (acc, cur) => union(acc, validMoves(cur));
+
+  const reachable = current
+    .reduce(reducer, [])
+    .filter(x => !visited.includes(x));
+
+  return [reachable, union(current, visited)];
+}
+
+// Applier takes a function, an init value, a predicate and applies
+// function repeadeatly until result satisfies a predicate,
+// returning number of function applications it took
+// applier: ((a -> a), s, (a -> Boolean)) -> Number
+function applier(f, initargs, predicate, i = 0) {
+  if (predicate(initargs)) return i;
+
+  const res = f(initargs);
+
+  return applier(f, res, predicate, i + 1)
 }
 
 // Main function
-// knight :: (String, String) -> Number | null
+// knight :: (String, String) -> Number
 function knight(start, finish) {
-  console.log(validMoves(algToMatrix(finish)).map(matrixToAlg), finish);
-  return null;
+  const stages = applier(
+    validMapper,
+    [[start], []],
+    x => x[0].includes(finish),
+  );
+  return stages;
 }
 
 const arr = [
