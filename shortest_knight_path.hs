@@ -1,4 +1,4 @@
--- https://www.codewars.com/kata/shortest-knight-path/train/javascript
+-- https://www.codewars.com/kata/shortest-knight-path/train/haskell
 -- Given two different positions on a chess board, find the least number of
 -- moves it would take a knight to get from one to the other.
 -- The positions will be passed as two arguments in algebraic notation.
@@ -10,15 +10,15 @@ module ShortestKnightPath.Kata (knight) where
 import qualified Data.Set as Set
 
 knight :: String -> String -> Int
-knight start finish =
-  applier validMapper ([start], Set.empty) finishReached 0
-    where finishReached = \(x, _) -> elem finish x
+knight start finish = length $ takeWhile finishNotReached moves
+  where finishNotReached = \(x, _) -> not $ elem finish x
+        moves = iterate validMapper ([start], Set.empty)
 
 onBoard :: String -> Bool
-onBoard (x:y:xs) = elem x ['a'..'h'] && elem y ['1'..'8']
+onBoard (x:y:_) = elem x ['a'..'h'] && elem y ['1'..'8']
 
 validMoves :: String -> [String]
-validMoves (x:y:xs) = filter onBoard [
+validMoves (x:y:_) = filter onBoard [
   [(pred . pred) x, succ y],
   [(pred . pred) x, pred y],
   [pred x, (succ . succ) y],
@@ -35,9 +35,3 @@ validMapper (current, visited) = (reachable, visitedUpdated)
         notYetVisited = \x -> Set.notMember x visited
         reducer = \cur acc -> validMoves cur ++ acc
         visitedUpdated = Set.union visited $ Set.fromList current
-
-applier :: (a -> a) -> a -> (a -> Bool) -> Int -> Int
-applier f initargs predicate i =
-  if predicate initargs then i
-  else applier f result predicate (i + 1)
-    where result = f initargs
