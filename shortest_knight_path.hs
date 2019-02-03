@@ -7,18 +7,18 @@
 
 module ShortestKnightPath.Kata (knight) where
 
-import qualified Data.Set as Set
+import qualified Data.Set as S
 
 knight :: String -> String -> Int
 knight start finish = length $ takeWhile finishNotReached moves
-  where finishNotReached = \(x, _) -> not $ elem finish x
-        moves = iterate validMapper ([start], Set.empty)
+  where finishNotReached = \(x, _) -> notElem finish x
+        moves = iterate validMapper (S.singleton start, S.empty)
 
 onBoard :: String -> Bool
 onBoard (x:y:_) = elem x ['a'..'h'] && elem y ['1'..'8']
 
-validMoves :: String -> [String]
-validMoves (x:y:_) = filter onBoard [
+validMoves :: String -> S.Set String
+validMoves (x:y:_) = S.filter onBoard $ S.fromList [
   [(pred . pred) x, succ y],
   [(pred . pred) x, pred y],
   [pred x, (succ . succ) y],
@@ -29,9 +29,10 @@ validMoves (x:y:_) = filter onBoard [
   [(succ . succ) x, pred y]
  ]
 
-validMapper :: ([String], Set.Set String) -> ([String], Set.Set String)
+validMapper :: (S.Set String, S.Set String) -> (S.Set String, S.Set String)
 validMapper (current, visited) = (reachable, visitedUpdated)
-  where reachable = filter notYetVisited $ foldr reducer [] current
-        notYetVisited = \x -> Set.notMember x visited
-        reducer = \cur acc -> validMoves cur ++ acc
-        visitedUpdated = Set.union visited $ Set.fromList current
+  where reachable = S.filter notYetVisited nextMove
+        nextMove = foldr reducer S.empty current
+        reducer = \cur acc -> S.union (validMoves cur) acc
+        notYetVisited = \x -> S.notMember x visited
+        visitedUpdated = S.union visited current
