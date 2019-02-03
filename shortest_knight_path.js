@@ -117,7 +117,7 @@ function validMapper([current, visited]) {
 // Applier takes a function, an init value, a predicate and applies
 // function repeadeatly until result satisfies a predicate,
 // returning number of function applications it took
-// applier: ((a -> a), s, (a -> Boolean)) -> Number
+// applier: ((a -> a), a, (a -> Boolean)) -> Number
 function applier(f, initargs, predicate, i = 0) {
   if (predicate(initargs)) return i;
 
