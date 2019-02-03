@@ -18,21 +18,20 @@ onBoard :: String -> Bool
 onBoard (x:y:_) = elem x ['a'..'h'] && elem y ['1'..'8']
 
 validMoves :: String -> S.Set String
-validMoves (x:y:_) = S.filter onBoard $ S.fromList [
-  [(pred . pred) x, succ y],
-  [(pred . pred) x, pred y],
-  [pred x, (succ . succ) y],
-  [pred x, (pred . pred) y],
-  [succ x, (succ . succ) y],
-  [succ x, (pred . pred) y],
-  [(succ . succ) x, succ y],
-  [(succ . succ) x, pred y]
- ]
+validMoves (x:y:_) = S.filter onBoard $ S.fromList
+  [ [(pred . pred) x, succ y]
+  , [(pred . pred) x, pred y]
+  , [(succ . succ) x, succ y]
+  , [(succ . succ) x, pred y]
+  , [pred x, (succ . succ) y]
+  , [pred x, (pred . pred) y]
+  , [succ x, (succ . succ) y]
+  , [succ x, (pred . pred) y]
+  ]
 
 validMapper :: (S.Set String, S.Set String) -> (S.Set String, S.Set String)
 validMapper (current, visited) = (reachable, visitedUpdated)
-  where reachable = S.filter notYetVisited nextMove
-        nextMove = foldr reducer S.empty current
-        reducer = \cur acc -> S.union (validMoves cur) acc
+  where reachable = S.filter notYetVisited $ foldr reducer S.empty current
+        reducer = \cur acc -> S.union acc $ validMoves cur
         notYetVisited = \x -> S.notMember x visited
         visitedUpdated = S.union visited current
