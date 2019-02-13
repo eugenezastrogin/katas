@@ -12,11 +12,11 @@ import qualified Data.Set as S
 main :: IO ()
 main = do
   putStr "Expected: 1, got: "
-  putStrLn $ show $ knight "a3" "b5"
+  print $ knight "a3" "b5"
   putStr "Expected: 3, got: "
-  putStrLn $ show $ knight "a1" "f3"
+  print $ knight "a1" "f3"
   putStr "Expected: 5, got: "
-  putStrLn $ show $ knight "a1" "f7"
+  print $ knight "a1" "f7"
 
 knight :: String -> String -> Int
 knight start finish = length $ takeWhile finishNotReached moves
