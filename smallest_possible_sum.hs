@@ -6,7 +6,8 @@
 
 module SmallestPossibleSum where
 
-import Data.List (sort)
+import Data.List (sort, delete)
+import qualified Data.Set as Set
 
 main :: IO ()
 main = do
@@ -15,7 +16,7 @@ main = do
   putStr "Expected: 3, got: "
   print $ smallestPossibleSum [1,21,55]
   putStr "Expected: 12, got: "
-  print $ smallestPossibleSum [4,15,24]
+  print $ smallestPossibleSum [4,16,24]
   putStr "Expected: 12, got: "
   print $ smallestPossibleSum [30,12]
   putStr "Expected: 923, got: "
@@ -27,9 +28,13 @@ main = do
 
 smallestPossibleSum :: (Integral a) => [a] -> a
 smallestPossibleSum m
-  | allEqual m = sum m
-  | otherwise = smallestPossibleSum $ ((last sorted) - (last (init sorted))) : (init sorted)
+  | length sm == 1 = sum m
+  | otherwise = smallestPossibleSum $ xi - xj : delete xi m
   where sorted = sort m
+        sm = Set.fromList m
+        tm = Set.deleteMax sm
+        xi = Set.findMax sm
+        xj = Set.findMax tm
 
 allEqual :: (Eq a) => [a] -> Bool
 allEqual m = not $ any (\x -> x /= m !! 0) m
