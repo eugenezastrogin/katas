@@ -6,9 +6,6 @@
 
 module SmallestPossibleSum where
 
-import Data.List (sort, delete)
-import qualified Data.Set as Set
-
 main :: IO ()
 main = do
   putStr "Expected: 9, got: "
@@ -27,14 +24,7 @@ main = do
   print $ smallestPossibleSum [60,12,96,48,60,24,72,36,72,72,48]
 
 smallestPossibleSum :: (Integral a) => [a] -> a
-smallestPossibleSum m
-  | length sm == 1 = sum m
-  | otherwise = smallestPossibleSum $ xi - xj : delete xi m
-  where sorted = sort m
-        sm = Set.fromList m
-        tm = Set.deleteMax sm
-        xi = Set.findMax sm
-        xj = Set.findMax tm
+smallestPossibleSum m = (fromIntegral . length) m * listGCD m
 
-allEqual :: (Eq a) => [a] -> Bool
-allEqual m = not $ any (\x -> x /= m !! 0) m
+listGCD :: (Integral a) => [a] -> a
+listGCD (x:xs) = foldl gcd x xs
